@@ -1,29 +1,32 @@
-"""
-This module contains basic calculator functions for addition and subtraction.
-"""
+from flask import Flask, render_template, request, jsonify
+
+app = Flask(__name__)
 
 def add(x, y):
-    """
-    Add two numbers together.
-
-    Args:
-        x (int or float): The first number.
-        y (int or float): The second number.
-
-    Returns:
-        int or float: The sum of the two numbers.
-    """
     return x + y
 
 def subtract(x, y):
-    """
-    Subtract the second number from the first.
-
-    Args:
-        x (int or float): The first number.
-        y (int or float): The second number.
-
-    Returns:
-        int or float: The difference between the two numbers.
-    """
     return x - y
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    data = request.get_json()
+    x = float(data.get('x'))
+    y = float(data.get('y'))
+    operation = data.get('operation')
+
+    if operation == 'add':
+        result = add(x, y)
+    elif operation == 'subtract':
+        result = subtract(x, y)
+    else:
+        return jsonify({'error': 'Invalid operation'}), 400
+
+    return jsonify({'result': result})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8001, debug=True)
